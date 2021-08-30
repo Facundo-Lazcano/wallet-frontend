@@ -109,7 +109,7 @@ export const updateMovement = (
 ) => async dispatch => {
   try {
     const res = await axios.put(
-      `api/movements/${id}/edit`,
+      `/api/movements/${id}/edit`,
 
       {
         amount,
@@ -121,6 +121,7 @@ export const updateMovement = (
       }
     )
     dispatch({ type: UPDATE_MOVEMENT, payload: res.data })
+    history.push('/')
   } catch (error) {
     console.log(error)
   }

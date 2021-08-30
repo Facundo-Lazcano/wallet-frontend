@@ -21,19 +21,28 @@ const AddOrEditMovements = ({
     if (!Add) {
       getMovement(match.params.id, auth.user.token)
     }
-  }, [getMovement, auth, Add, match, movement])
+  }, [])
 
-  const [amount, setAmount] = useState(movement.movements['amount'] || 0)
+  const [amount, setAmount] = useState(Add ? '' : movement.movements['amount'])
   const [description, setDescription] = useState(
-    movement.movements['description'] || ''
+    Add ? '' : movement.movements['description']
   )
-  const [category, setCategory] = useState(movement.movements['category'] || '')
-  const [date, setDate] = useState(movement.movements['date'] || '')
+  const [category, setCategory] = useState(
+    Add ? '' : movement.movements['category']
+  )
   const movement_type = match.params.type
 
   const handleAddOrEdit = () => {
     if (Add) {
       addMovement(amount, description, movement_type, category, auth.user.token)
+    } else {
+      updateMovement(
+        movement.movements.id,
+        amount,
+        description,
+        category,
+        auth.user.token
+      )
     }
   }
 
@@ -76,17 +85,6 @@ const AddOrEditMovements = ({
             value={category}
             onChange={e => setCategory(e.target.value)}
             className='form-control'
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='Date'>Date</label>
-          <input
-            type='date'
-            name='Date'
-            id='Date'
-            className='form-control'
-            value={date}
-            onChange={e => setDate(e.target.value)}
           />
         </div>
         <input
