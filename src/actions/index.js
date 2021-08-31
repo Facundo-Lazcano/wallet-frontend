@@ -1,5 +1,6 @@
 import axios from 'axios'
 import history from '../history'
+import Swal from 'sweetalert2'
 import {
   ADD_MOVEMENT,
   DELETE_MOVEMENT,
@@ -8,7 +9,8 @@ import {
   LOGIN,
   LOGOUT,
   REGISTER,
-  UPDATE_MOVEMENT
+  UPDATE_MOVEMENT,
+  SORT_BY_CATEGORY
 } from './types'
 
 export const login = (email, password) => async dispatch => {
@@ -17,6 +19,8 @@ export const login = (email, password) => async dispatch => {
       email,
       password
     })
+    localStorage.setItem('user', res.data.name)
+    localStorage.setItem('token', res.data.token)
     dispatch({ type: LOGIN, payload: res.data })
     history.push('/')
   } catch (error) {
@@ -31,7 +35,8 @@ export const register = (name, email, password) => async dispatch => {
       email,
       password
     })
-    console.log(res.data)
+    localStorage.setItem('user', res.data.name)
+    localStorage.setItem('token', res.data.token)
     dispatch({ type: REGISTER, payload: res.data })
     history.push('/')
   } catch (error) {
@@ -43,6 +48,8 @@ export const logout = () => async dispatch => {
   try {
     const res = await axios.post(`/api/logout`)
     dispatch({ type: LOGOUT, payload: res.data })
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
     history.push('/login')
   } catch (error) {
     console.log(error)
@@ -94,6 +101,13 @@ export const addMovement = (
     )
 
     dispatch({ type: ADD_MOVEMENT, payload: res.data })
+    await Swal.fire({
+      position: 'top-right',
+      icon: 'success',
+      title: 'Your movement has been created',
+      showConfirmButton: false,
+      timer: 1500
+    })
     history.push('/')
   } catch (error) {
     console.log(error)
@@ -121,6 +135,13 @@ export const updateMovement = (
       }
     )
     dispatch({ type: UPDATE_MOVEMENT, payload: res.data })
+    await Swal.fire({
+      position: 'top-right',
+      icon: 'success',
+      title: 'Your movement has been updated',
+      showConfirmButton: false,
+      timer: 1500
+    })
     history.push('/')
   } catch (error) {
     console.log(error)
@@ -128,12 +149,28 @@ export const updateMovement = (
 }
 
 export const deleteMovement = (id, token) => async dispatch => {
-  try {
-    const res = await axios.delete(`api/movements/${id}/delete`, {
-      headers: { authorization: `Bearer ${token}` }
-    })
-    dispatch({ type: DELETE_MOVEMENT, payload: res.data })
-  } catch (error) {
-    console.log(error)
+  const res = await Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+  })
+  if (res.isConfirmed) {
+    Swal.fire('Deleted!', 'Your movement has been deleted.', 'success')
+    try {
+      await axios.delete(`api/movements/${id}/delete`, {
+        headers: { authorization: `Bearer ${token}` }
+      })
+      dispatch({ type: DELETE_MOVEMENT, payload: id })
+    } catch (error) {
+      console.log(error)
+    }
   }
+}
+
+export const sortMovementsByCategory = () => dispatch => {
+  dispatch({ type: SORT_BY_CATEGORY })
 }

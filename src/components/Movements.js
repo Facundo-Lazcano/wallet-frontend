@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import './Movements.css'
 import { connect } from 'react-redux'
-import { deleteMovement } from '../actions'
+import { deleteMovement, sortMovementsByCategory } from '../actions'
 
 const Movements = ({
   type,
@@ -10,8 +10,13 @@ const Movements = ({
   entrysAmount,
   expensesAmount,
   deleteMovement,
+  sortMovementsByCategory,
   auth
 }) => {
+  useEffect(() => {
+    renderMovements()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const renderMovements = () => {
     return (
       <>
@@ -29,7 +34,10 @@ const Movements = ({
                   </Link>
                   <button
                     onClick={() =>
-                      deleteMovement(movement['id'], auth.user.token)
+                      deleteMovement(
+                        movement['id'],
+                        localStorage.getItem('token')
+                      )
                     }
                   >
                     <i className='fas fa-trash-alt'></i>
@@ -51,7 +59,13 @@ const Movements = ({
           <tr>
             <th>Amount</th>
             <th>Description</th>
-            <th>Category</th>
+            <th>
+              <input
+                type='button'
+                onClick={sortMovementsByCategory}
+                value='Category'
+              />
+            </th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
@@ -64,8 +78,8 @@ const Movements = ({
         </Link>
       </div>
       <div className='total'>
-        <p>Total {type}:</p>{' '}
-        <p>${type === 'Entrys' ? entrysAmount : expensesAmount}</p>
+        <p>Total {type}:</p>
+        <p>${type === 'entrys' ? entrysAmount : expensesAmount}</p>
       </div>
     </div>
   )
@@ -77,4 +91,7 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { deleteMovement })(Movements)
+export default connect(mapStateToProps, {
+  deleteMovement,
+  sortMovementsByCategory
+})(Movements)

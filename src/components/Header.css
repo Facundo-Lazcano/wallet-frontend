@@ -5,6 +5,10 @@
     background-color: aqua;
 }
 
+a:hover {
+    text-decoration: none;
+}
+
 .header h1 {
     padding: 1rem;
 }

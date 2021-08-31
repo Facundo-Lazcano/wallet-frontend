@@ -14,34 +14,40 @@ const AddOrEditMovements = ({
   match,
   movement
 }) => {
+  const [amount, setAmount] = useState('')
+  const [description, setDescription] = useState('')
+  const [category, setCategory] = useState('')
+  const movement_type = match.params.type
+
   useEffect(() => {
-    if (!auth.user || movement === undefined) {
+    if (!localStorage.getItem('token') || movement === undefined) {
       history.push('/login')
     }
     if (!Add) {
-      getMovement(match.params.id, auth.user.token)
+      getMovement(match.params.id, localStorage.getItem('token'))
+      setAmount(movement.movements.amount)
+      setDescription(movement.movements.description)
+      setCategory(movement.movements.category)
     }
-  }, [])
-
-  const [amount, setAmount] = useState(Add ? '' : movement.movements['amount'])
-  const [description, setDescription] = useState(
-    Add ? '' : movement.movements['description']
-  )
-  const [category, setCategory] = useState(
-    Add ? '' : movement.movements['category']
-  )
-  const movement_type = match.params.type
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getMovement])
 
   const handleAddOrEdit = () => {
     if (Add) {
-      addMovement(amount, description, movement_type, category, auth.user.token)
+      addMovement(
+        amount,
+        description,
+        movement_type,
+        category,
+        localStorage.getItem('token')
+      )
     } else {
       updateMovement(
         movement.movements.id,
         amount,
         description,
         category,
-        auth.user.token
+        localStorage.getItem('token')
       )
     }
   }
@@ -51,7 +57,6 @@ const AddOrEditMovements = ({
       <Header />
       <div className='form'>
         <h2>
-          {' '}
           {Add ? 'Add' : 'Edit'} {match.params.type}{' '}
         </h2>
         <div className='form-group'>

@@ -15,6 +15,13 @@ td {
 
 }
 
+input {
+    background-color: transparent;
+    border: none;
+    color: #000000;
+    font-weight: 700;
+}
+
 .actions a {
     color: #000000;
 

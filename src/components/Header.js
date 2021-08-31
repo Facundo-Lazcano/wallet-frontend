@@ -2,13 +2,17 @@ import React from 'react'
 import './Header.css'
 import { connect } from 'react-redux'
 import { logout } from '../actions'
+import { Link } from 'react-router-dom'
 
 const Header = ({ auth, logout }) => {
+  const name = localStorage.getItem('user')
   return (
     <div className='header'>
-      <h1>Virtual Wallet</h1>
+      <Link to='/'>
+        <h1>Virtual Wallet</h1>
+      </Link>
       <div className='user'>
-        {auth.user ? <p>Hello {auth.user.name}</p> : null}
+        {localStorage.getItem('user') ? <p>Hello {name}</p> : null}
         <button className='logout' type='submit' onClick={logout}>
           Logout
         </button>
