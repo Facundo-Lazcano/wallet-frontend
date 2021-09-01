@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { updateMovement, getMovement, addMovement } from '../actions'
 import Header from '../components/Header'
 import history from '../history'
@@ -20,17 +21,19 @@ const AddOrEditMovements = ({
   const movement_type = match.params.type
 
   useEffect(() => {
-    if (!localStorage.getItem('token') || movement === undefined) {
+    if (!localStorage.getItem('token')) {
       history.push('/login')
     }
     if (!Add) {
       getMovement(match.params.id, localStorage.getItem('token'))
-      setAmount(movement.movements.amount)
-      setDescription(movement.movements.description)
-      setCategory(movement.movements.category)
+      if (movement.movements) {
+        setAmount(movement.movements.amount || '')
+        setDescription(movement.movements.description || '')
+        setCategory(movement.movements.category || '')
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getMovement])
+  }, [movement.movements.amount])
 
   const handleAddOrEdit = () => {
     if (Add) {
@@ -57,7 +60,7 @@ const AddOrEditMovements = ({
       <Header />
       <div className='form'>
         <h2>
-          {Add ? 'Add' : 'Edit'} {match.params.type}{' '}
+          {Add ? 'Add' : 'Edit'} {match.params.type}
         </h2>
         <div className='form-group'>
           <label htmlFor='amount'>Amount</label>
@@ -92,12 +95,17 @@ const AddOrEditMovements = ({
             className='form-control'
           />
         </div>
-        <input
-          onClick={handleAddOrEdit}
-          type='button'
-          value={Add ? 'Add' : 'Edit'}
-          className='btn btn-primary'
-        />
+        <div className='buttons'>
+          <input
+            onClick={handleAddOrEdit}
+            type='button'
+            value={Add ? 'Add' : 'Edit'}
+            className='btn btn-primary'
+          />
+          <div className='btn btn-danger'>
+            <Link to='/'>Cancel</Link>
+          </div>
+        </div>
       </div>
     </div>
   )
